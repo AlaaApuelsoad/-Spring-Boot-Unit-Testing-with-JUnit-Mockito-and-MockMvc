@@ -1,21 +1,9 @@
-# JUnit Testing
+# JUnit Testing Course
 
 ## What is JUnit?
 
 JUnit is a widely-used testing framework for Java applications. It provides annotations and assertions to help developers write and run repeatable automated tests. JUnit is essential for Test-Driven Development (TDD) and ensures code quality through systematic testing.
 
-
-## Project Overview
-
-This repository contains practical examples demonstrating JUnit 5 (Jupiter) testing capabilities. The `DemoUtilsTest` class showcases various testing techniques and best practices used in real-world Java development.
-
-## Getting Started
-
-### Prerequisites
-
-- Java 8 or higher
-- JUnit 5 (Jupiter)
-- Maven or Gradle build tool
 
 ### Dependencies
 
@@ -29,8 +17,6 @@ Add JUnit 5 to your `pom.xml`:
     <scope>test</scope>
 </dependency>
 ```
-
-## Core Concepts Covered
 
 ### Test Lifecycle Annotations
 
@@ -152,6 +138,179 @@ void testTimeout(){
 }
 ```
 
+## Conditional Test Execution
+
+JUnit 5 provides powerful annotations to control when tests should run based on various conditions. This is useful for environment-specific tests, OS-specific functionality, or JRE version compatibility testing.
+
+### Conditional Annotations Overview
+
+| Annotation | Purpose | Example Use Case |
+|------------|---------|------------------|
+| `@Disabled` | Disables a test method or class | Temporarily skip broken tests |
+| `@EnabledIf` | Runs test if custom condition is true | Environment-specific tests |
+| `@EnabledOnOs` | Runs test only on specific operating systems | OS-specific functionality |
+| `@DisabledOnOs` | Disables test on specific operating systems | Exclude incompatible OS |
+| `@EnabledOnJre` | Runs test only on specific JRE versions | Version-specific features |
+| `@DisabledOnJre` | Disables test on specific JRE versions | Avoid known JRE issues |
+| `@EnabledForJreRange` | Runs test within a JRE version range | Compatibility range testing |
+| `@EnabledIfSystemProperty` | Runs test if system property matches | Configuration-based tests |
+| `@EnabledIfSystemProperties` | Runs test if multiple system properties match | Complex system requirements |
+| `@EnabledIfEnvironmentVariable` | Runs test if environment variable matches | Environment-based execution |
+| `@EnabledIfEnvironmentVariables` | Runs test if multiple environment variables match | Multi-variable conditions |
+
+### Disabling Tests
+
+Temporarily disable tests that need to be fixed:
+
+```java
+@Test
+@DisplayName("Basic Test")
+@Disabled("Don't run until JIRA #123 is resolved")
+void basicTest(){
+    System.out.println("Running test: basicTest");
+}
+```
+
+### Custom Conditional Execution
+
+Run tests based on custom conditions:
+
+```java
+@Test
+@DisplayName("Test Enabled Conditionally")
+@EnabledIf("isDevEnvironment")
+void testEnabledConditionally() {
+    System.out.println("Running in DEV");
+}
+
+boolean isDevEnvironment() {
+    return "dev".equals(System.getenv("ENVIRONMENT_PROFILE"));
+}
+```
+
+### Operating System Specific Tests
+
+Run tests only on specific operating systems:
+
+```java
+@Test
+@DisplayName("Test on Windows only")
+@EnabledOnOs(OS.WINDOWS)
+void testOnWindowsOnly(){
+    System.out.println("test method is running only on Windows");
+}
+
+@Test
+@DisplayName("Test on Linux only")
+@EnabledOnOs(OS.LINUX)
+void testOnLinuxOnly(){
+    System.out.println("test method is running only on Linux");
+}
+```
+
+### JRE Version Specific Tests
+
+Run tests based on Java Runtime Environment version:
+
+```java
+@Test
+@DisplayName("Test on JRE version: 17 only")
+@EnabledOnJre({JRE.JAVA_17})
+void testOnJava17Only(){
+    System.out.println("test method is running only on JRE version: 17");
+}
+
+@Test
+@DisplayName("Test on JRE version: 22 only")
+@EnabledOnJre({JRE.JAVA_22})
+void testOnJava22Only(){
+    System.out.println("test method is running only on JRE version: 22");
+}
+
+@Test
+@DisplayName("Test on JRE version: 17 to 22")
+@EnabledForJreRange(min = JRE.JAVA_17, max = JRE.JAVA_22)
+void testOnJavaRange(){
+    System.out.println("test method is running on JRE version: 17 to 22");
+}
+```
+
+### System Property Based Tests
+
+Run tests based on system properties:
+
+```java
+@Test
+@DisplayName("Test on System Property")
+@EnabledIfSystemProperty(named = "user.name", matches = "apuel")
+void testOnSystemProperty(){
+    System.out.println("test method is running on system property");
+}
+
+@Test
+@DisplayName("Test on Multiple System Properties")
+@EnabledIfSystemProperties({
+    @EnabledIfSystemProperty(
+        named = "java.version", 
+        matches = "17.0.9", 
+        disabledReason = "Not supported on your JRE version"
+    ),
+    @EnabledIfSystemProperty(
+        named = "user.name", 
+        matches = "apuel", 
+        disabledReason = "Not supported with user"
+    )
+})
+void testOnSystemProperties(){
+    System.out.println("test method is running on system properties");
+}
+```
+
+### Environment Variable Based Tests
+
+Run tests based on environment variables:
+
+```java
+@Test
+@DisplayName("Test on Environment Variable")
+@EnabledIfEnvironmentVariable(named = "ENVIRONMENT_PROFILE", matches = "dev")
+void testOnEnvironmentVariable(){
+    System.out.println("test method is running on Environment variable");
+}
+
+@Test
+@DisplayName("Test on Multiple Environment Variables")
+@EnabledIfEnvironmentVariables(value = {
+    @EnabledIfEnvironmentVariable(named = "ENVIRONMENT_PROFILE", matches = "dev"),
+    @EnabledIfEnvironmentVariable(named = "ENVIRONMENT_NAME", matches = "DEV")
+})
+void testOnEnvironmentVariables() {
+    System.out.println("test method is running on Environment variables");
+}
+```
+
+### Setting Environment Variables
+
+To run environment-specific tests, set the required environment variables:
+
+**Windows (Command Prompt):**
+```cmd
+set ENVIRONMENT_PROFILE=dev
+set ENVIRONMENT_NAME=DEV
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:ENVIRONMENT_PROFILE="dev"
+$env:ENVIRONMENT_NAME="DEV"
+```
+
+**Linux/Mac:**
+```bash
+export ENVIRONMENT_PROFILE=dev
+export ENVIRONMENT_NAME=DEV
+```
+
 ## Test Organization
 
 ### Display Names
@@ -192,13 +351,6 @@ Different strategies for generating display names (commented examples):
 mvn test
 ```
 
-
-### From IDE
-
-Most IDEs (IntelliJ IDEA, Eclipse, VS Code) support running JUnit tests directly:
-- Right-click on the test class
-- Select "Run Tests" or "Run DemoUtilsTest"
-
 ## Best Practices Demonstrated
 
 1. **Descriptive test names** - Using `@DisplayName` for clarity
@@ -206,3 +358,6 @@ Most IDEs (IntelliJ IDEA, Eclipse, VS Code) support running JUnit tests directly
 3. **Proper setup and teardown** - Using lifecycle annotations to manage test state
 4. **Meaningful messages** - Including failure messages in assertions for better debugging
 5. **Testing edge cases** - Including null checks, exception handling, and timeouts
+6. **Conditional execution** - Running tests based on environment, OS, and JRE version
+7. **Environment isolation** - Using custom conditions and environment variables for different deployment scenarios
+

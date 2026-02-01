@@ -1,6 +1,7 @@
 package org.example.alaa;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -14,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 //@TestMethodOrder(MethodOrderer.Default.class)
 //@TestMethodOrder(MethodOrderer.Random.class)
 //@TestMethodOrder(MethodOrderer.MethodName.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@TestMethodOrder(MethodOrderer.DisplayName.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DemoUtilsTest {
 
     private DemoUtils demoUtils;
@@ -131,4 +132,101 @@ class DemoUtilsTest {
                 "Method should execute in 3 seconds");
     }
 
+    //####Conditional Test annotations####
+    @Test
+    @DisplayName("Test Enabled Conditionally")
+    @EnabledIf("isDevEnvironment")
+    void testEnabledConditionally() {
+        System.out.println("Running in DEV");
+    }
+
+    boolean isDevEnvironment() {
+        return "dev".equals(System.getenv("ENVIRONMENT_PROFILE"));
+    }
+
+    @Test
+    @DisplayName("Basic Test")
+    @Disabled("Don't run until JIRA #123 is resolved")
+    void basicTets(){
+        //execute method performing assertions
+        System.out.println("Running test: basicTets");
+    }
+
+    @Test
+    @DisplayName("Test on Windows only")
+    @EnabledOnOs(OS.WINDOWS)
+    void testOnWindowsOnly(){
+        //execute method performing assertions
+        System.out.println("test method is running only on Windows");
+    }
+
+    @Test
+    @DisplayName("Test on Linux only")
+    @EnabledOnOs(OS.LINUX)
+    void testOnLinuxOnly(){
+        //execute method performing assertions
+        System.out.println("test method is running only on Linux");
+    }
+
+    @Test
+    @DisplayName("Test on JRE version: 17 only")
+    @EnabledOnJre({JRE.JAVA_17})
+    void testOnJava17Only(){
+        //execute method performing assertions
+        System.out.println("test method is running only on JRE version: 17");
+    }
+
+    @Test
+    @DisplayName("Test on JRE version: 22 only")
+    @EnabledOnJre({JRE.JAVA_22})
+    void testOnJava22Only(){
+        //execute method performing assertions
+        System.out.println("test method is running only on JRE version: 22");
+    }
+
+    @Test
+    @DisplayName("Test on JRE version: 17 to 22")
+    @EnabledForJreRange(min = JRE.JAVA_17, max = JRE.JAVA_22)
+    void testOnJavaRange(){
+        //execute method performing assertions
+        System.out.println("test method is running on JRE version: 17 to 22");
+    }
+
+    @Test
+    @DisplayName("Test on System Property")
+    @EnabledIfSystemProperty(named = "user.name",matches = "apuel")
+    void testOnSystemProperty(){
+        //execute method performing assertions
+        System.out.println("test method is running on system property");
+    }
+
+    @Test
+    @DisplayName("Test on Multiple System Properties")
+    @EnabledIfSystemProperties({
+            @EnabledIfSystemProperty(named = "java.version",matches = "17.0.9",disabledReason = "Not supported on your JRE version"),
+            @EnabledIfSystemProperty(named = "user.name",matches = "apuel",disabledReason = "Not supported with user")
+    })
+    void testOnSystemProperties(){
+        //execute method performing assertions
+        System.out.println("test method is running on system properties");
+    }
+
+    @Test
+    @DisplayName("Test on Environment Variable")
+    @EnabledIfEnvironmentVariable(named = "ENVIRONMENT_PROFILE",matches = "dev")
+    void testOnEnvironmentVariable(){
+        //execute method performing assertions
+        System.out.println("test method is running on Environment variable");
+    }
+
+    @Test
+    @DisplayName("Test on Multiple Environment Variables")
+    @EnabledIfEnvironmentVariables(value = {
+            @EnabledIfEnvironmentVariable(named = "ENVIRONMENT_PROFILE", matches = "dev"),
+            @EnabledIfEnvironmentVariable(named = "ENVIRONMENT_NAME", matches = "DEV")
+    })
+    void testOnEnvironmentVariables() {
+        //execute method performing assertions
+        System.out.println("test method is running on Environment variables");
+    }
 }
