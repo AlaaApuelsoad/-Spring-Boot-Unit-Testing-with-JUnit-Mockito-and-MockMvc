@@ -5,6 +5,28 @@
 JUnit is a widely-used testing framework for Java applications. It provides annotations and assertions to help developers write and run repeatable automated tests. JUnit is essential for Test-Driven Development (TDD) and ensures code quality through systematic testing.
 
 
+---
+
+## What is TDD?
+
+Test-Driven Development (TDD) is a software development practice where **tests are written before the actual implementation**. It enforces a disciplined development cycle that results in cleaner, more reliable code.
+
+### The TDD Cycle
+
+| Step | Color | Action |
+|------|-------|--------|
+| 1. Red | 🔴 | Write a failing test that defines the desired behavior |
+| 2. Green | 🟢 | Write the minimum code necessary to make the test pass |
+| 3. Refactor | 🔵 | Clean up and improve the code without breaking any tests |
+
+### Benefits of TDD
+- Passing tests increase confidence in the code
+- Gives freedom to refactor safely without fear of breaking things
+- Forces you to define requirements clearly before writing implementation
+- Results in more modular, testable, and maintainable code
+
+---
+
 ### Dependencies
 
 Add JUnit 5 to your `pom.xml`:
@@ -311,6 +333,89 @@ export ENVIRONMENT_PROFILE=dev
 export ENVIRONMENT_NAME=DEV
 ```
 
+## Parameterized Tests
+
+Parameterized tests allow you to run the **same test method multiple times with different inputs**, eliminating the need to write duplicate test methods for similar scenarios. They are declared using `@ParameterizedTest` combined with a data source annotation.
+
+### Why Use Parameterized Tests?
+
+- Reduces code duplication across similar test cases
+- Makes it easy to add new test cases without new methods
+- Produces clear, labeled test reports showing each input and result
+- Encourages data-driven testing practices
+
+---
+
+### `@ParameterizedTest`
+
+The core annotation that marks a method as a parameterized test. It must always be paired with one of the data source annotations below. Supports a `name` attribute to customize how each test run is labeled in reports, using placeholders like `{0}` and `{1}` to reference argument values.
+
+---
+
+### Data Source Annotations
+
+| Annotation | Data Location | Best For |
+|------------|---------------|----------|
+| `@ValueSource` | Inline, single values | Simple single-argument tests |
+| `@CsvSource` | Inline, multiple values per row | Small fixed multi-argument datasets |
+| `@CsvFileSource` | External CSV file on classpath | Large or separately maintained datasets |
+| `@EnumSource` | Enum constants | Testing all or filtered enum values |
+| `@MethodSource` | Static factory method | Complex, dynamic, or object-based data |
+| `@NullSource` | A single null value | Verifying null-handling behavior |
+| `@EmptySource` | A single empty value | Verifying empty input behavior |
+
+---
+
+### `@ValueSource`
+
+Provides a **simple array of a single type** of values — such as ints, strings, doubles, or booleans — directly within the annotation. Each value is passed as the sole argument to one invocation of the test. It is the most concise data source and is ideal when only one parameter is needed per test run.
+
+**Supported types:** `int`, `long`, `double`, `float`, `byte`, `short`, `char`, `boolean`, `String`, `Class`
+
+---
+
+### `@CsvSource`
+
+Provides test data as **inline comma-separated value strings** directly within the annotation. Each string represents one row of arguments, which are automatically converted to the matching method parameter types. Ideal for small, fixed datasets where keeping the data close to the test improves readability.
+
+**Key attribute:** `value` — an array of CSV strings, one per test invocation.
+
+---
+
+### `@CsvFileSource`
+
+Loads test data from an **external CSV file** located on the classpath (typically under `src/test/resources`). Each row in the file represents one test invocation. This is the preferred approach for large datasets or when test data is managed and maintained separately from the test code itself.
+
+**Key attributes:**
+- `resources` — path(s) to the CSV file(s) on the classpath
+- `numLinesToSkip` — number of header lines to skip at the top of the file
+- `delimiter` — character used to separate values (default is comma)
+
+---
+
+### `@EnumSource`
+
+Passes **enum constants** as arguments to the parameterized test. By default, all constants in the specified enum are included. It supports optional filtering to include or exclude specific constants by name, using a `mode` attribute to control the selection strategy.
+
+**Key attributes:**
+- `value` — the enum class to use as the data source
+- `names` — specific enum constant names to include or exclude
+- `mode` — selection strategy: `INCLUDE`, `EXCLUDE`, `MATCH_ALL`, `MATCH_ANY`
+
+---
+
+### Parameterized Test Strategy Guide
+
+| Scenario | Recommended Annotation |
+|----------|------------------------|
+| Testing with a few simple values of the same type | `@ValueSource` |
+| Testing with multiple columns of data, small fixed set | `@CsvSource` |
+| Testing with many rows or externally managed data | `@CsvFileSource` |
+| Testing behavior across all or some enum values | `@EnumSource` |
+| Testing with complex objects or programmatic data | `@MethodSource` |
+
+---
+
 ## Test Organization
 
 ### Display Names
@@ -353,11 +458,14 @@ mvn test
 
 ## Best Practices Demonstrated
 
-1. **Descriptive test names** - Using `@DisplayName` for clarity
-2. **Comprehensive assertions** - Testing various scenarios (positive and negative cases)
-3. **Proper setup and teardown** - Using lifecycle annotations to manage test state
-4. **Meaningful messages** - Including failure messages in assertions for better debugging
-5. **Testing edge cases** - Including null checks, exception handling, and timeouts
-6. **Conditional execution** - Running tests based on environment, OS, and JRE version
-7. **Environment isolation** - Using custom conditions and environment variables for different deployment scenarios
+1. **Follow the TDD cycle** - Write a failing test first, then implement just enough code to pass it, then refactor
+2. **Descriptive test names** - Using `@DisplayName` for clarity in test reports and IDEs
+3. **Comprehensive assertions** - Testing various scenarios (positive and negative cases)
+4. **Proper setup and teardown** - Using lifecycle annotations to manage test state
+5. **Meaningful messages** - Including failure messages in assertions for better debugging
+6. **Testing edge cases** - Including null checks, exception handling, and timeouts
+7. **Conditional execution** - Running tests based on environment, OS, and JRE version
+8. **Environment isolation** - Using custom conditions and environment variables for different deployment scenarios
+9. **Avoid test duplication** - Prefer `@ParameterizedTest` with the appropriate data source over writing multiple identical test methods
+10. **Choose the right data source** - Use `@ValueSource` for simple single inputs, `@CsvSource` for inline multi-column data, `@CsvFileSource` for large external datasets, and `@EnumSource` for enum-driven tests
 
