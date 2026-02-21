@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class FizBuzzTest {
+class FizzBuzzTest {
     /*
     Benefits: passing test increase confidence in the code.
               Gives freedom to refactor

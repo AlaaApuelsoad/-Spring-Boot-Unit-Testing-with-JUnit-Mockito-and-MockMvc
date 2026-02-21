@@ -452,9 +452,53 @@ Different strategies for generating display names (commented examples):
 
 ### Using Maven
 
+Run all tests in the project:
+
 ```bash
 mvn test
 ```
+
+### Run a Specific Test Class
+
+To run only one test class and skip all others:
+
+```bash
+mvn -Dtest=FizzBuzzTest test
+```
+
+### Run a Specific Test Method
+
+To run a single method inside a test class, useful when debugging a particular case:
+
+```bash
+mvn -Dtest=FizzBuzzTest#testFizz test
+```
+
+### Run Multiple Methods from the Same Class
+
+To run more than one method from the same class in a single command:
+
+```bash
+mvn -Dtest=FizzBuzzTest#testFizz+testBuzz test
+```
+
+### Run Multiple Test Classes
+
+To run several test classes together while skipping the rest:
+
+```bash
+mvn -Dtest=FizzBuzzTest,DemoUtilsTest test
+```
+
+### Quick Reference
+
+| Goal | Command |
+|------|---------|
+| Run all tests | `mvn test` |
+| Run one class | `mvn -Dtest=ClassName test` |
+| Run one method | `mvn -Dtest=ClassName#methodName test` |
+| Run multiple methods | `mvn -Dtest=ClassName#method1+method2 test` |
+| Run multiple classes | `mvn -Dtest=Class1,Class2 test` |
 
 ## Best Practices Demonstrated
 
